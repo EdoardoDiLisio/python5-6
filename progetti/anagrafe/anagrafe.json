@@ -29,16 +29,16 @@
         "data nascita": "24/02/1990",
         "codice fiscale": "aaaaa"
     },
-    "jhfbiwfhiwhfiwhiw": {
-        "nome": "ciccio",
-        "cognome": "sprizzo",
-        "data nascita": "12/12/05",
-        "codice fiscale": "jhfbiwfhiwhfiwhiw"
-    },
     "DLSDRD00E30H501A": {
         "nome": "Edoardo",
         "cognome": "Di Lisio",
         "data nascita": "30/05/2000",
         "codice fiscale": "DLSDRD00E30H501A"
+    },
+    "aaabbb": {
+        "nome": "Giovanni",
+        "cognome": "Napoleone",
+        "dataNascita": "26/04/2005",
+        "codFiscale": "aaabbb"
     }
 }
