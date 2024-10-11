@@ -7,7 +7,30 @@ api = Flask(__name__)
 file_path = "anagrafe.json"
 cittadini = JsonDeserialize(file_path)
 
-                                             
+file_path_users = "utenti.json"
+utenti = JsonDeserialize(file_path_users)
+
+@api.route('/login', methods=['POST'])
+def GestisciLogin():
+    content_type = request.headers.get('Content-Type')
+    if content_type == 'application/json':
+        jsonReq = request.json
+        usernameClient = jsonReq["username"]
+        if usernameClient in utenti:
+            passwordServer = utenti[usernameClient]["password"]
+            passwordClient = jsonReq["password"]
+            if passwordClient == passwordServer:
+                privilegi = utenti[usernameClient]["privilegi"]
+                return jsonify({"Esito": "000", "Msg": "login effetuato", "Privilegi": privilegi}), 200
+            else:
+                return jsonify({"Esito": "001", "Msg": "Password Errata"}), 200
+        else:
+            return jsonify({"Esito": "001", "Msg": "Utente non trovato"}), 200 
+
+    else:
+        return jsonify({"Esito": "001", "Msg": "Richiesta non valida"}), 200  
+
+
 @api.route('/add_cittadino', methods=['POST'])
 def GestisciAddCittadino():
     content_type = request.headers.get('Content-Type')
@@ -94,4 +117,3 @@ def elimina_cittadino():
         return jsonify({"Esito": "002", "Msg": "Formato richiesta non valido"}), 200
 
 api.run(host="127.0.0.1", port=8080)
-

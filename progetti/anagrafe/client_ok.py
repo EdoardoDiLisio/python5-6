@@ -3,6 +3,22 @@ import requests, json, sys
 base_url = "http://127.0.0.1:8080"
 
 
+def EseguiLogin():
+    global sUsername, sPassword
+
+    sUsername = input("Inserisci Username: ")
+    sPassword = input("Inserisci la password: ")
+
+    credenziali = {
+        "username": sUsername,
+        "password": sPassword
+    }
+    return credenziali
+
+
+
+
+
 def GetDatiCittadino():
     nome = input("Inserisci il nome: ")
     cognome = input("Inserisci il cognome: ")
@@ -41,6 +57,21 @@ def EseguiOperazione(iOper, sServizio, dDatiToSend):
         print("Problemi di comunicazione con il server, riprova più tardi.")
 
 print("Benvenuti al Comune - sede locale")
+
+accessoEffettuato = 0
+while accessoEffettuato == 0:
+    jsonDataRequest = EseguiLogin()
+    api_url = base_url + '/login'
+    try:
+
+        response = requests.post(api_url, json = jsonDataRequest)
+        dizionarioRisposta = response.json()
+        print(response.json())
+        if dizionarioRisposta["Esito"] == "000":
+            accessoEffettuato = 1
+            
+    except:
+        print("Problemi di comunicazione con il server, riprova più tardi.")
 
 iFlag = 0
 while iFlag==0:
@@ -91,7 +122,3 @@ while iFlag==0:
 
     else:
         print("Operazione non disponibile, riprova.")
-
-
-
-
