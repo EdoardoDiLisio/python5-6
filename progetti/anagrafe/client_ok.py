@@ -2,22 +2,17 @@ import requests, json, sys
 
 base_url = "http://127.0.0.1:8080"
 
+def GetCredenziali():
 
-def EseguiLogin():
-    global sUsername, sPassword
+    global username, password
 
-    sUsername = input("Inserisci Username: ")
-    sPassword = input("Inserisci la password: ")
-
+    username = input("Inserisci il tuo username: ")
+    password = input("Inserisci la tua password: ")
     credenziali = {
-        "username": sUsername,
-        "password": sPassword
+        "username": username,
+        "password": password
     }
     return credenziali
-
-
-
-
 
 def GetDatiCittadino():
     nome = input("Inserisci il nome: ")
@@ -54,71 +49,114 @@ def EseguiOperazione(iOper, sServizio, dDatiToSend):
         else:
             print("Attenzione, errore " + str(response.status_code))
     except:
-        print("Problemi di comunicazione con il server, riprova più tardi.")
+        print("Problemi di comunicazione con il server, riprova piÃ¹ tardi.")
 
 print("Benvenuti al Comune - sede locale")
 
-accessoEffettuato = 0
-while accessoEffettuato == 0:
-    jsonDataRequest = EseguiLogin()
-    api_url = base_url + '/login'
-    try:
+print("\nImmettere le credenziali: ")
 
-        response = requests.post(api_url, json = jsonDataRequest)
-        dizionarioRisposta = response.json()
-        print(response.json())
-        if dizionarioRisposta["Esito"] == "000":
-            accessoEffettuato = 1
+accesso_effettuato = 0
+permessi = 0
+
+
+while accesso_effettuato == 0:
+    richiesta = GetCredenziali()
+    login_url = base_url + "/login"
+    try:
+        risposta = requests.post(login_url, json=richiesta)
+        dizionario_risposta = risposta.json()
+        if dizionario_risposta["Esito"] == "000":
+            accesso_effettuato = 1
+            if dizionario_risposta["Privilegio"] == "w":
+                permessi = 1
+                
+            else:
+                permessi = 0
             
+        else:
+            print("Accesso non consentito")
+    
     except:
-        print("Problemi di comunicazione con il server, riprova più tardi.")
+        print("Errore di comunicazione con il server")
+        accesso_effettuato = 0
 
-iFlag = 0
-while iFlag==0:
-    print("\nOperazioni disponibili:")
-    print("1. Inserisci cittadino")
-    print("2. Richiedi cittadino")
-    print("3. Modifica cittadino")
-    print("4. Elimina cittadino")
-    print("5. Esci")
-
-
-    try:
-        iOper = int(input("Cosa vuoi fare? "))
-    except ValueError:
-        print("Inserisci un numero valido!")
-        continue
+if permessi == 1:
+    
+    iFlag = 0
+    while iFlag==0:
+        print("\nOperazioni disponibili:")
+        print("1. Inserisci cittadino")
+        print("2. Richiedi cittadino")
+        print("3. Modifica cittadino")
+        print("4. Elimina cittadino")
+        print("5. Esci")
 
 
-    if iOper == 1:
-        print("Aggiunta cittadino")
-        api_url = base_url + "/add_cittadino"
-        jsonDataRequest = GetDatiCittadino()
-        EseguiOperazione(1, api_url, jsonDataRequest)
-
-    # Richiesta dati cittadino
-    elif iOper == 2:
-        print("Richiesta dati cittadino")
-        api_url = base_url + "/read_cittadino"
-        jsonDataRequest = GetCodicefiscale()
-        EseguiOperazione(2, api_url + "/" + jsonDataRequest['codFiscale'],None)
-
-    elif iOper == 3:
-        print("Modifica cittadino")
-        api_url = base_url + "/update_cittadino"
-        jsonDataRequest = GetDatiCittadino()
-        EseguiOperazione(3, api_url, jsonDataRequest)
+        try:
+            iOper = int(input("Cosa vuoi fare? "))
+        except ValueError:
+            print("Inserisci un numero valido!")
+            continue
 
 
-    elif iOper == 4:
-        print("Eliminazione cittadino")
-        api_url = base_url + "/elimina_cittadino"
-        jsonDataRequest = GetCodicefiscale()
-        EseguiOperazione(4, api_url, jsonDataRequest)
+        if iOper == 1:
+            print("Aggiunta cittadino")
+            api_url = base_url + "/add_cittadino"
+            jsonDataRequest = GetDatiCittadino()
+            EseguiOperazione(1, api_url, jsonDataRequest)
 
-    elif iOper == 5:
-        print("Buona giornata!")
-        iFlag = 1
+        # Richiesta dati cittadino
+        elif iOper == 2:
+            print("Richiesta dati cittadino")
+            api_url = base_url + "/read_cittadino"
+            jsonDataRequest = GetCodicefiscale()
+            EseguiOperazione(2, api_url + "/" + jsonDataRequest['codFiscale'],None)
 
-    else:
-        print("Operazione non disponibile, riprova.")
+        elif iOper == 3:
+            print("Modifica cittadino")
+            api_url = base_url + "/update_cittadino"
+            jsonDataRequest = GetDatiCittadino()
+            EseguiOperazione(3, api_url, jsonDataRequest)
+
+
+        elif iOper == 4:
+            print("Eliminazione cittadino")
+            api_url = base_url + "/elimina_cittadino"
+            jsonDataRequest = GetCodicefiscale()
+            EseguiOperazione(4, api_url, jsonDataRequest)
+
+        elif iOper == 5:
+            print("Buona giornata!")
+            iFlag = 1
+
+        else:
+            print("Operazione non disponibile, riprova.")
+else:
+    
+    iFlag = 0
+    while iFlag==0:
+        print("\nOperazioni disponibili:")
+        print("1. Richiedi cittadino")
+        print("2. Esci")
+
+
+        try:
+            iOper = int(input("Cosa vuoi fare? "))
+        except ValueError:
+            print("Inserisci un numero valido!")
+            continue
+
+        # Richiesta dati cittadino
+        if iOper == 1:
+            print("Richiesta dati cittadino")
+            api_url = base_url + "/read_cittadino"
+            jsonDataRequest = GetCodicefiscale()
+            EseguiOperazione(2, api_url + "/" + jsonDataRequest['codFiscale'],None)
+
+        elif iOper == 2:
+            print("Buona giornata!")
+            iFlag = 1
+
+        else:
+            print("Operazione non disponibile, riprova.")
+

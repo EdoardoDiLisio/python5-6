@@ -7,30 +7,29 @@ api = Flask(__name__)
 file_path = "anagrafe.json"
 cittadini = JsonDeserialize(file_path)
 
-file_path_users = "utenti.json"
-utenti = JsonDeserialize(file_path_users)
+utenti_path = "utenti.json"
+utenti = JsonDeserialize(utenti_path)
 
 @api.route('/login', methods=['POST'])
 def GestisciLogin():
     content_type = request.headers.get('Content-Type')
-    if content_type == 'application/json':
+    print(content_type)
+    if content_type =='application/json':
         jsonReq = request.json
-        usernameClient = jsonReq["username"]
-        if usernameClient in utenti:
-            passwordServer = utenti[usernameClient]["password"]
-            passwordClient = jsonReq["password"]
-            if passwordClient == passwordServer:
-                privilegi = utenti[usernameClient]["privilegi"]
-                return jsonify({"Esito": "000", "Msg": "login effetuato", "Privilegi": privilegi}), 200
+        username = jsonReq["username"]
+        if username in utenti:
+            password_server = utenti[username]["password"]
+            password_client = jsonReq["password"]
+            if password_server == password_client:
+                privilegio = utenti[username]["privilegi"]
+                return jsonify({"Esito": "000", "Msg": "Credenziali corrette", "Privilegio": privilegio}), 200
             else:
-                return jsonify({"Esito": "001", "Msg": "Password Errata"}), 200
+                return jsonify({"Esito": "001", "Msg": "Password errata"}), 200
         else:
-            return jsonify({"Esito": "001", "Msg": "Utente non trovato"}), 200 
-
+            return jsonify({"Esito": "001", "Msg": "Utente non trovato"}), 200
     else:
-        return jsonify({"Esito": "001", "Msg": "Richiesta non valida"}), 200  
-
-
+        return jsonify({"Esito": "001", "Msg": "Formato richiesta non valido"})
+                                             
 @api.route('/add_cittadino', methods=['POST'])
 def GestisciAddCittadino():
     content_type = request.headers.get('Content-Type')
@@ -43,7 +42,7 @@ def GestisciAddCittadino():
 
         codice_fiscale = jsonReq.get('codFiscale')
         if codice_fiscale in cittadini:
-            return jsonify({"Esito": "001", "Msg": "Cittadino già esistente"}), 200
+            return jsonify({"Esito": "001", "Msg": "Cittadino giÃ  esistente"}), 200
         else:
             cittadini[codice_fiscale] = jsonReq
             JsonSerialize(cittadini, file_path) 
@@ -116,4 +115,4 @@ def elimina_cittadino():
     else:
         return jsonify({"Esito": "002", "Msg": "Formato richiesta non valido"}), 200
 
-api.run(host="127.0.0.1", port=8080)
+api.run(host="127.0.0.1", port=8080, ssl_context="adhoc")
