@@ -1,9 +1,22 @@
-import requests, json, sys
+from myjson import *
+import requests
+import subprocess
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+
+
+def ComponiJsonPerImmagine(sImagePath):
+    subprocess.run(["rm", "./image.jpg"])
+    subprocess.run(["rm", "./request.json"])
+    subprocess.run(["cp", sImagePath,"./image.jpg"])
+    subprocess.run(["bash", "./creajsonpersf.sh"])
+
 base_url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key="
-googleApiKey = "AIzaSyBUNGwjvWKB6K9dFxDLUcNoQggUlq89ElY"
+
+googleAPIKey = "AIzaSyDqe4mFnJ62eYkMRqjl5v9KyMj4j9H86Es"
+
+api_url = base_url + googleAPIKey
 
 def EseguiOperazione(iOper, sServizio, dDatiToSend):
     try:
@@ -27,13 +40,12 @@ print("Benvenuti nella mia Generative AI")
 
 print("\nImmettere le credenziali: ")
 
-
 iFlag = 0
 while iFlag==0:
     print("\nOperazioni disponibili:")
     print("1. Creare una favola")
     print("2. Rispondere ad una domanda")
-    print("3. Rispondere ad una domanda su un file img")
+    print("3. Rispondere ad una domanda su file img")
     print("4. Esci")
 
 
@@ -45,23 +57,35 @@ while iFlag==0:
 
 
     if iOper == 1:
-        argomentoFav = input("Inserisci l'argomento della favola: ")
-        api_url = base_url + googleApiKey
-        jsonDataRequest = {"contents": [{"parts":[{"text": argomentoFav}]}]}
-        #EseguiOperazione(1, api_url, jsonDataRequest)
+        argomento_favola = input("Aggiungi un argomento per la favola: ")
+        jsonDataRequest = {"contents": [{"parts":[{"text": argomento_favola}]}]}
+        # EseguiOperazione(1, api_url, jsonDataRequest)
         response = requests.post(api_url, json=jsonDataRequest, verify=False)
-        if response.status_code==200:
+        if response.status_code == 200:
             response = response.json()
             #print(response.json())
             testo = response['candidates'][0]['content']['parts'][0]['text']
             print(testo)
 
     elif iOper == 2:
-        print("Richiesta dati cittadino")
+        print("Rispondere ad una domanda")
+        
 
     elif iOper == 3:
-        print("Modifica cittadino")
-        
+        print("Rispondere ad una domanda su file img")       
+        immagine = input("Inserisci il path competo del file che vuoi analizzare: ")
+        domanda = input("Inserisci la domanda: ")
+        domanda = domanda + "tradotto in italiano"
+        ComponiJsonPerImmagine(immagine)
+        RequestJson = JsonDeserialize("request.json")
+        RequestJson['contents'][0]['parts'][0]['text'] = domanda
+        response = requests.post(api_url, json=RequestJson, verify=False)
+        print()
+        if response.status_code == 200:
+            response = response.json()
+            testo = response['candidates'][0]['content']['parts'][0]['text']
+            print(testo)      
+
     elif iOper == 4:
         print("Buona giornata!")
         iFlag = 1

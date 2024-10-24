@@ -1,6 +1,3 @@
-# Gioele Amendola
-# 29/09/2024
-
 try:
     import json
 except ImportError:
