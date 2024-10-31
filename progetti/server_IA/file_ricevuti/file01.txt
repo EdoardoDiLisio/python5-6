@@ -1,0 +1,3 @@
+le funzioni aggregate sono funzioni che appaiono 
+le funzioni aggregate ignorano i valori null
+
