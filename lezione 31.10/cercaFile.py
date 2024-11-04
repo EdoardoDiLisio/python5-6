@@ -37,7 +37,7 @@ def cerca_e_copia_file(cartella_di_partenza, parola, cartella_di_destinazione):
                 shutil.copy2(percorso_file, cartella_di_destinazione)
                 print(f"Copiato: {file} -> {cartella_di_destinazione}\n")
             else:
-                extension_supportate: dict = {".pdf": "application/pdf", ".gif": "image/gif", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", "png": "image/png"}
+                extension_supportate: dict = {".pdf": "application/pdf", ".gif": "image/gif", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", "png": "image/png", ".txt": "text/plain"}
                 percorso_file = os.path.join(root, file)
                 filename, file_extension = os.path.splitext(percorso_file)
                 if file_extension not in extension_supportate:
@@ -63,5 +63,5 @@ def cerca_e_copia_file(cartella_di_partenza, parola, cartella_di_destinazione):
                 else:
                     print("Errore server\n")
                     continue
-
+                
 cerca_e_copia_file(cartella_di_partenza, parola, cartella_di_destinazione)
